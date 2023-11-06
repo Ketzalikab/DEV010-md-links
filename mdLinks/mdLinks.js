@@ -1,7 +1,8 @@
 const fsPromises = require('fs').promises;
 const pathModule = require('path');
+const axios = require('axios');
 
-function mdLinks(path) {
+function mdLinks(path, validate) {
     return new Promise((resolve, reject) => {
         if (!path) {
             throw new Error('Ruta no proporcionada.');
@@ -18,24 +19,49 @@ function mdLinks(path) {
                 const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g;
                 const links = [];
                 let match;
+                let promises = [];
 
                 while ((match = linkRegex.exec(fileContent)) !== null) {
                     const text = match[1];
                     const href = match[2];
-                    links.push({
+                    const linkObj = {
                         href,
                         text,
                         file: absolutePath,
-                    });
+                    };
+                    links.push(linkObj);
+
+                    if (validate) {
+                        const linkValidation = axios.head(href)
+                        .then(response => {
+                            linkObj.status = response.status;
+                            linkObj.ok = response.status >= 200 && response.status <400 ? 'ok' : 'fail';
+                        })
+                        .catch(error => {
+                            linkObj.status = 'N/A';
+                            linkObj.ok = 'fail';
+
+                        });
+                        promises.push(linkValidation);
+                    }
                 }
 
-                console.log('Enlaces encontrados:', links);
-                resolve(links);
+                if (validate) {
+                    Promise.all(promises)
+                    .then(() => {
+                        resolve(links);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+                } else {
+                    resolve(links);
+                }
             })
             .catch(err => {
-                console.log('Error al leer el archivo:', err);
+                reject(new Error('Error al leer el archivo: ' + err));
             });
-    });
-}
+        });
+    }
 
 module.exports = mdLinks;
