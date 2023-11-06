@@ -5,8 +5,7 @@ const axios = require('axios');
 function mdLinks(path, validate) {
     return new Promise((resolve, reject) => {
         if (!path) {
-            throw new Error('Ruta no proporcionada.');
-            reject(new Error('Debes proporcionar una ruta válida.'));
+            reject(new Error('Ruta no proporcionada.'));
             return;
         }
 
