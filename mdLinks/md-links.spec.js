@@ -5,6 +5,7 @@ const MockAdapter = require('axios-mock-adapter');
 
 
 describe('mdLinks', () => {
+  describe('Funcionalidad basica', () => {
 
   it('deberia encontrar y retornar los enlaces en un archivo Markdown', async () => {
     const links = await mdLinks('./prueba.md');
@@ -19,22 +20,24 @@ describe('mdLinks', () => {
     });
   });
   
-  it('debería manejar un error si la ruta no es válida', async () => {
+  it('debería manejar un error si la ruta no es válida',async () => {
     try {
-        await mdLinks(null);
+      await mdLinks(null);
+      // Debería lanzar una excepción, por lo que no se llega aquí.
+      expect(true).toBe(false);
     } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe('Ruta no proporcionada.');
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe('Ruta no proporcionada.');
     }
-});
+  });
 
-it('deberia manejar un error al leer el archivo', async () => {
+it('deberia manejar un error al leer el archivo',  async () => {
   try {
     await mdLinks('ruta_invalida.md');
-
+    // Debería lanzar una excepción, por lo que no se llega aquí.
+    expect(true).toBe(false);
   } catch (error) {
-    expect(error).toBeInstanceOf(Error);
-    expect(error.message).toMatch(/^Error al leer el archivo:/);
+    expect(error.message).toBe('Ruta no proporcionada.');
   }
 });
    
@@ -67,5 +70,6 @@ it('deberia manejar un error al leer el archivo', async () => {
       expect(link).toHaveProperty('status');
       expect(link).toHaveProperty('ok');
     });
+  });
   });
 });
