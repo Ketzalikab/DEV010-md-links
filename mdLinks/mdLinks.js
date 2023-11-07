@@ -1,21 +1,65 @@
 const fsPromises = require('fs').promises;
 const pathModule = require('path');
 const axios = require('axios');
+const fs = require('fs');
 
 function mdLinks(path, validate) {
     return new Promise((resolve, reject) => {
-        if (!path) {
-            reject(new Error('Ruta no proporcionada.'));
+        if (path === null) {
+            throw new Error('Ruta no proporcionada.');
             return;
         }
-
         const absolutePath = pathModule.resolve(path);
-        fsPromises.access(absolutePath, fsPromises.constants.F_OK)
-        .then(() => {
-        return fsPromises.readFile(absolutePath, 'utf8');
-     })
-            .then(fileContent => {
-                const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g;
+
+        if (!fs.existsSync(absolutePath)) {
+            throw new Error('Ruta no proporcionada.');
+        }
+
+        if (fs.lstatSync(absolutePath).isDirectory()) {
+            const files = getMarkdownFiles(absolutePath);
+            const allLinks = [];
+
+            const processFilePromises = files.map(file => {
+                const filePath = pathModule.join(absolutePath, file);
+                return processMarkdownFile(filePath, validate, absolutePath);
+
+            });
+
+            Promise.all(processFilePromises)
+            .then((results) => {
+                resolve([].concat(...results));
+            })
+            .catch((err) =>{
+                reject(err);
+            });
+        } else if (fs.lstatSync(absolutePath).isFile() && path.endsWith('.md')) {
+            processMarkdownFile(absolutePath, validate, absolutePath)
+            .then((links) => {
+                resolve(links);
+
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        } else {
+            resolve ([]);
+        }
+    });
+}
+function getMarkdownFiles(dirPath) {
+    const files =fs.readdirSync(dirPath);
+    return files.filter(file => file.endsWith('.md'));
+}
+
+function processMarkdownFile(filePath, validate, absolutePath) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, fileContent) => {
+            if (err) {
+                reject(new Error(`Error al leer el archivo: ${err.message}`));
+                return;
+            }
+     
+        const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s]+)\)/g;
                 const links = [];
                 let match;
                 let promises = [];
@@ -56,11 +100,9 @@ function mdLinks(path, validate) {
                 } else {
                     resolve(links);
                 }
-            })
-            .catch(err => {
-                reject(new Error('Error al leer el archivo: ' + err));
             });
         });
-    }
 
+        }
+ 
 module.exports = mdLinks;
