@@ -1,22 +1,26 @@
 const mdLinks = require('./mdLinks.js');
 const pathModule = require('path');
-const filePath = pathModule.join(__dirname, 'prueba.md');
-mdLinks(filePath)
-  .then(links => {
-    console.log('Enlaces encontrados:', links);
-    console.log(links);
 
-    if (Array.isArray(links)) {
-      console.log('Prueba 2: links es un array')
-    } else {
-      console.error('Prueba 2: links NO es un array.');
-    }
-    if (links.length > 0) {
-      console.log('Prueba 3: No se econtraron al menos un enlace.');
-    } else {
-      console.error('Prueba 3: No se encontraron enlaces.');
-    }
+const filePath = pathModule.join(__dirname, 'prueba.md');
+
+// Caso 1: Obtener solo información básica de los enlaces
+mdLinks(filePath, true)
+  .then(links => {
+    console.log('Enlaces encontrados (sin validación):', links);
   })
   .catch(err => {
     console.error(err);
   });
+
+// Caso 2: Obtener información adicional de validación de los enlaces
+mdLinks(filePath, false)
+  .then(links => {
+    console.log('Enlaces encontrados con validación:', links);
+  })
+  .catch(err => {
+    console.error(err);
+  });
+
+  /*Este documento de test va a mandar a llamar a la funcion mdLinks para que
+  dentro del archivo de prueba encuentre el el array con los links y los muestre*/
+   
