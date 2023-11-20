@@ -1,5 +1,5 @@
 const { expect } = require('@playwright/test');
-const mdLinks = require('./mdLinks');
+const mdLinks = require('../mdLinks');
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
 const fs = require('fs');
