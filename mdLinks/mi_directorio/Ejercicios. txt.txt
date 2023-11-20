@@ -1,0 +1,9 @@
+Ejercicios. js
+
+
+
+"Tú y tu cita están tratando de conseguir una mesa en un restaurante. El parámetro 'you' representa la elegancia de tu ropa, en un rango de 0 a 10, y 'date' es la elegancia de la ropa de tu cita. El resultado de conseguir la mesa se codifica como un valor entero, donde 0=no, 1=tal vez, 2=sí. Si alguno de los dos es muy elegante, con una puntuación de 8 o más, entonces el resultado es 2 (sí). Con la excepción de que si alguno de ustedes tiene un estilo de 2 o menos, entonces el resultado es 0 (no). De lo contrario, el resultado es 1 (tal vez)." 
+
+objetivo: es conseguir la mesa 
+you = a la elegancia de mi ropa su rango es de 0 -10 
+date = 

@@ -2,10 +2,22 @@ const { expect } = require('@playwright/test');
 const mdLinks = require('./mdLinks');
 const axios = require('axios');
 const MockAdapter = require('axios-mock-adapter');
+const fs = require('fs');
 
 
-describe('mdLinks', () => {
+describe('mdLinks - Cobertura Especifica', () => {
   describe('Funcionalidad basica', () => {
+   
+  it('deberia llamar a getMarkdownFiles si la ruta es un directorio', async() => {
+    jest.spyOn(fs.promises, 'lstat').mockResolvedValue({ isDirectory: () => true});
+    jest.spyOn(fs.promises, 'readdir').mockResolvedValue([]);
+    await expect(mdLinks('directorio', false)).resolves.toEqual([]);
+  });
+  
+  it('deberia resolver con un array vacio si el archivo no es .md', async () => {
+    jest.spyOn(fs.promises, 'lstat').mockResolvedValue({isDirectory: () => false, isFile: () => true});
+   await expect(mdLinks('archivo.txt',false)).resolves.toEqual([]);
+  });
 
   it('deberia encontrar y retornar los enlaces en un archivo Markdown', async () => {
     const links = await mdLinks('./prueba.md');
@@ -37,7 +49,7 @@ it('deberia manejar un error al leer el archivo',  async () => {
     // Debería lanzar una excepción, por lo que no se llega aquí.
     expect(true).toBe(false);
   } catch (error) {
-    expect(error.message).toBe('Ruta no proporcionada.');
+    expect(error.message).toMatch(/ENOENT/);
   }
 });
    
